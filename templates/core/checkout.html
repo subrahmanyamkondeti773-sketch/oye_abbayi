@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}Checkout - Oye Abbayi{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-5">
+    <div class="col-lg-8">
+        <div class="card border-0 rounded-5 shadow-sm p-5" style="background: white;">
+            <div class="text-center mb-5">
+                <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex p-3 mb-3">
+                    <i class="fas fa-receipt text-success fs-2"></i>
+                </div>
+                <h2 class="fw-bold">Review Your Order</h2>
+                <p class="text-muted">Almost there! Please check your details before confirming.</p>
+            </div>
+
+            <div class="row g-5">
+                <!-- Shipping Info -->
+                <div class="col-md-6 border-end">
+                    <h5 class="fw-bold mb-4"><i class="fas fa-truck text-success me-2"></i>Delivery Details</h5>
+                    <div class="bg-light rounded-4 p-4 mb-4">
+                        <div class="mb-3">
+                            <label class="small text-muted d-block">Recipient</label>
+                            <span class="fw-bold">{{ request.user.get_full_name|default:request.user.username }}</span>
+                        </div>
+                        <div class="mb-0">
+                            <label class="small text-muted d-block">Email</label>
+                            <span class="fw-bold">{{ request.user.email }}</span>
+                        </div>
+                    </div>
+                    <div class="alert alert-warning border-0 rounded-4 px-4 py-3 small shadow-sm">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Currently, we only support <strong>Cash on Delivery</strong> to ensure the highest quality from our farmers.
+                    </div>
+                </div>
+
+                <!-- Order Detail -->
+                <div class="col-md-6">
+                    <h5 class="fw-bold mb-4"><i class="fas fa-shopping-bag text-success me-2"></i>Order Summary</h5>
+                    <div class="list-group list-group-flush mb-4">
+                        {% for item in cart.items.all %}
+                        <div class="list-group-item border-0 px-0 d-flex justify-content-between align-items-center py-3">
+                            <div>
+                                <h6 class="mb-0 fw-bold">{{ item.product.name }}</h6>
+                                <span class="small text-muted">Quantity: {{ item.quantity }} × ₹{{ item.product.price }} / {{ item.product.unit }}</span>
+                            </div>
+                            <span class="fw-bold text-success">₹{{ item.subtotal }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="bg-light rounded-4 p-4">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="fw-bold m-0">Grand Total</h5>
+                            <h5 class="fw-bold text-success m-0">₹{{ cart.total_price }}</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-5">
+                <form action="{% url 'checkout' %}" method="post" class="d-grid gap-3">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-grocery btn-lg rounded-pill shadow py-3 fw-bold">
+                        <i class="fas fa-check-circle me-2"></i>Confirm & Place Order
+                    </button>
+                    <a href="{% url 'cart' %}" class="btn btn-link text-muted text-decoration-none small">
+                        <i class="fas fa-arrow-left me-1"></i> Edit Cart
+                    </a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

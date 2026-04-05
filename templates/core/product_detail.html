@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ product.name }} - Oye Abbayi{% endblock %}
+
+{% block content %}
+<div class="row g-5 py-5">
+    <!-- Product Image -->
+    <div class="col-lg-6">
+        <div class="position-sticky" style="top: 100px;">
+            <div class="card border-0 rounded-5 overflow-hidden shadow-sm" style="background: white;">
+                {% if product.image %}
+                <img src="{{ product.image.url }}" class="img-fluid" alt="{{ product.name }}" style="width: 100%; height: 500px; object-fit: cover;">
+                {% else %}
+                <div class="bg-light p-5 text-center d-flex flex-column align-items-center justify-content-center" style="height: 500px;">
+                    <img src="/static/images/default_product.png" class="img-fluid opacity-25 mb-3" style="max-height: 200px;">
+                    <p class="text-muted fw-bold">Fresh from our Farms</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Info -->
+    <div class="col-lg-6">
+        <div class="ps-lg-4">
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-success text-decoration-none">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'home' %}?category_id={{ product.category.id }}" class="text-success text-decoration-none">{{ product.category.name }}</a></li>
+                    <li class="breadcrumb-item active text-muted">{{ product.name }}</li>
+                </ol>
+            </nav>
+
+            <span class="badge bg-light text-success px-3 py-2 rounded-pill mb-3 fw-bold border border-success border-opacity-25">
+                <i class="{{ product.category.icon_class|default:'fas fa-tag' }} me-1"></i> {{ product.category.name }}
+            </span>
+            
+            <h1 class="display-5 fw-bold mb-3 text-dark">{{ product.name }}</h1>
+            
+            <div class="d-flex align-items-center gap-3 mb-4">
+                <h2 class="display-6 fw-bold text-success m-0">₹{{ product.price }}</h2>
+                <span class="text-muted">/ {{ product.unit }}</span>
+            </div>
+
+            <p class="fs-5 text-muted mb-5 leading-relaxed">{{ product.description }}</p>
+
+            <div class="card border-0 rounded-4 p-4 shadow-sm mb-5" style="background: #fdfdfd; border: 1px solid #f2f2f2 !important;">
+                <div class="row align-items-center g-3">
+                    <div class="col-md-6 text-start">
+                        <h6 class="fw-bold mb-2">Availability:</h6>
+                        {% if product.stock > 0 %}
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge bg-success rounded-pill px-3 py-2">In Stock</span>
+                            <span class="small text-muted">{{ product.stock }} units left</span>
+                        </div>
+                        {% else %}
+                        <span class="badge bg-danger rounded-pill px-3 py-2">Out of Stock</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            {% if product.stock > 0 %}
+            <form action="{% url 'add_to_cart' product.id %}" method="post" class="mb-4">
+                {% csrf_token %}
+                <div class="d-flex flex-wrap gap-3 align-items-center mb-4">
+                    <div class="input-group" style="width: 150px;">
+                        <button class="btn btn-outline-success rounded-start-pill px-3" type="button" onclick="this.parentNode.querySelector('input').stepDown()">-</button>
+                        <input type="number" name="quantity" value="1" min="1" max="{{ product.stock }}" class="form-control text-center border-success fw-bold" readonly>
+                        <button class="btn btn-outline-success rounded-end-pill px-3" type="button" onclick="this.parentNode.querySelector('input').stepUp()">+</button>
+                    </div>
+                    <button type="submit" class="btn btn-grocery btn-lg rounded-pill px-5 flex-grow-1 py-3 shadow">
+                        <i class="fas fa-cart-plus me-2"></i> Add to Cart
+                    </button>
+                </div>
+            </form>
+            
+            <div class="d-grid gap-3">
+                <!-- Hidden Buy Now form -->
+                <form id="buyNowForm" action="{% url 'buy_now' product.id %}" method="post" class="d-none">
+                    {% csrf_token %}
+                </form>
+                
+                <button type="button" class="btn btn-outline-success btn-lg rounded-pill py-3 fw-bold" data-bs-toggle="modal" data-bs-target="#confirmOrderModal">
+                    <i class="fas fa-bolt me-2"></i> Buy Now
+                </button>
+            </div>
+            {% else %}
+            <div class="alert alert-warning border-0 rounded-4 p-4 text-center">
+                <i class="fas fa-clock fa-2x mb-3 text-warning"></i>
+                <h5 class="fw-bold">Item Currently Unavailable</h5>
+                <p class="mb-0 small">Sorry, we are out of stock. Leave your email and we'll notify you when it's back!</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="py-5 mt-5">
+    <h3 class="fw-bold mb-4">You Might Also Like</h3>
+    <div class="row">
+        <!-- We can dynamically populate related products here in the future -->
+        <div class="col-12 text-center py-5 bg-white rounded-5 shadow-sm opacity-50">
+            <p class="m-0 text-muted italic">Discovering more fresh items for you...</p>
+        </div>
+    </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div class="modal fade" id="confirmOrderModal" tabindex="-1" aria-labelledby="confirmOrderModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow-lg">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold" id="confirmOrderModalLabel">
+                    <i class="fas fa-shopping-bag text-success me-2"></i>Confirm Your Order
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-4">
+                <div class="d-flex align-items-center gap-3 mb-4">
+                    {% if product.image %}
+                    <img src="{{ product.image.url }}" class="rounded-3"
+                        style="width:70px;height:70px;object-fit:cover;" alt="">
+                    {% endif %}
+                    <div>
+                        <h6 class="fw-bold mb-1">{{ product.name }}</h6>
+                        <span class="text-success fw-bold fs-5">₹{{ product.price }}</span>
+                    </div>
+                </div>
+                <div class="alert alert-light border rounded-3 mb-0">
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle me-1 text-success"></i>
+                        1 item will be ordered and payment of <strong>₹{{ product.price }}</strong> will be charged.
+                    </small>
+                </div>
+            </div>
+            <div class="modal-footer border-0 pt-0 gap-2">
+                <button type="button" class="btn btn-outline-secondary rounded-pill px-4"
+                    data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-grocery rounded-pill px-4"
+                    onclick="document.getElementById('buyNowForm').submit()">
+                    <i class="fas fa-check me-2"></i>Confirm Order
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+
+{% block title %}Oye Abbayi - Home{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="row align-items-center py-5 mb-5 g-5">
+    <div class="col-lg-6">
+        <h6 class="text-uppercase fw-bold text-success mb-3" style="letter-spacing: 2px;">Fresh from the Heart of Villages</h6>
+        <h1 class="display-3 fw-bold mb-4" style="color: var(--text-dark); line-height: 1.1;">Experience the <span style="color: var(--primary-color);">Purity</span> of Rural Harvest.</h1>
+        <p class="lead text-muted mb-5">Connecting you directly with local farmers. No middleman, just fresh, organic, and healthy groceries delivered to your home.</p>
+        <div class="d-flex gap-3">
+            <a href="#products" class="btn btn-grocery btn-lg shadow">Shop Fresh</a>
+            <a href="{% url 'home' %}?category_id=1" class="btn btn-outline-success btn-lg rounded-pill px-4">Our Groceries</a>
+        </div>
+        <div class="mt-5 d-flex align-items-center gap-4">
+            <div class="d-flex align-items-center gap-2">
+                <i class="fas fa-check-circle text-success"></i>
+                <span class="small fw-600">100% Organic</span>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <i class="fas fa-truck text-success"></i>
+                <span class="small fw-600">Fast Delivery</span>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <i class="fas fa-leaf text-success"></i>
+                <span class="small fw-600">Farmer Direct</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="position-relative">
+            <div class="bg-warning rounded-circle position-absolute" style="width: 400px; height: 400px; z-index: -1; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.1;"></div>
+            <img src="/static/images/hero_farmer.png" alt="Oye Abbayi Farmer" class="img-fluid mx-auto d-block" style="max-height: 450px; filter: drop-shadow(0 20px 40px rgba(0,0,0,0.1));">
+        </div>
+    </div>
+</div>
+
+<!-- Category Filters -->
+<div class="mb-5">
+    <div class="d-flex justify-content-between align-items-end mb-4">
+        <h3 class="fw-bold m-0"><i class="fas fa-th-large text-success me-2"></i> Shop by Category</h3>
+        <a href="{% url 'home' %}" class="text-success text-decoration-none small fw-bold">View All <i class="fas fa-arrow-right ms-1"></i></a>
+    </div>
+    <div class="d-flex gap-3 overflow-auto pb-3 no-scrollbar" style="-ms-overflow-style: none; scrollbar-width: none;">
+        <a href="{% url 'home' %}" class="btn {% if not request.GET.category_id %}btn-success shadow-sm{% else %}btn-white border{% endif %} rounded-pill px-4 py-2 text-nowrap fw-bold">
+            All Items
+        </a>
+        {% for cat in all_categories %}
+        <a href="{% url 'home' %}?category_id={{ cat.id }}" class="btn {% if request.GET.category_id == cat.id|stringformat:'i' %}btn-success shadow-sm{% else %}btn-white border{% endif %} rounded-pill px-4 py-2 text-nowrap fw-bold d-flex align-items-center gap-2">
+            <i class="{{ cat.icon_class|default:'fas fa-tag' }}"></i> {{ cat.name }}
+        </a>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Products Grid -->
+<div id="products" class="row">
+    <div class="col-12 d-flex justify-content-between align-items-center mb-4">
+        <h4 class="fw-bold m-0">
+            {% if request.GET.q %}
+                Results for "{{ request.GET.q }}"
+            {% elif request.GET.category_id %}
+                {% for cat in all_categories %}
+                    {% if request.GET.category_id == cat.id|stringformat:'i' %}{{ cat.name }}{% endif %}
+                {% endfor %}
+            {% else %}
+                Fresh Arrivals
+            {% endif %}
+        </h4>
+        <div class="dropdown">
+            <button class="btn btn-white border dropdown-toggle rounded-pill px-3" type="button" data-bs-toggle="dropdown">
+                Sort By
+            </button>
+            <ul class="dropdown-menu border-0 shadow rounded-3">
+                <li><a class="dropdown-item" href="#">Newest First</a></li>
+                <li><a class="dropdown-item" href="#">Price: Low to High</a></li>
+                <li><a class="dropdown-item" href="#">Price: High to Low</a></li>
+            </ul>
+        </div>
+    </div>
+
+    {% for product in featured_products %}
+    <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+        <div class="card h-100 border-0">
+            <!-- Product Image -->
+            <div class="position-relative overflow-hidden" style="height: 220px;">
+                <a href="{% url 'product_detail' product.pk %}">
+                    {% if product.image %}
+                    <img src="{{ product.image.url }}" class="card-img-top w-100 h-100" alt="{{ product.name }}" style="object-fit: cover;">
+                    {% else %}
+                    <img src="/static/images/default_product.png" class="card-img-top w-100 h-100 opacity-50" alt="{{ product.name }}" style="object-fit: cover; background: #f8f9fa;">
+                    {% endif %}
+                </a>
+                
+                {% if product.stock < 1 %}
+                <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="background: rgba(255,255,255,0.7); z-index: 2;">
+                    <span class="badge bg-danger rounded-pill px-3 py-2 shadow-sm fs-6">Out of Stock</span>
+                </div>
+                {% elif product.stock < 10 %}
+                <span class="badge bg-warning text-dark position-absolute top-0 start-0 m-3 rounded-pill px-2 py-1 shadow-sm small">Low Stock: {{ product.stock }}</span>
+                {% endif %}
+                
+                <button class="btn btn-white position-absolute top-0 end-0 m-3 rounded-circle shadow-sm p-2 bg-white" style="width: 35px; height: 35px; color: #ff6b6b;"><i class="far fa-heart"></i></button>
+            </div>
+
+            <!-- Product Details -->
+            <div class="card-body d-flex flex-column p-4">
+                <p class="small text-success fw-bold mb-1"><i class="{{ product.category.icon_class|default:'fas fa-tag' }} me-1"></i> {{ product.category.name }}</p>
+                <h5 class="card-title fw-bold mb-2">
+                    <a href="{% url 'product_detail' product.pk %}" class="text-decoration-none text-dark">{{ product.name }}</a>
+                </h5>
+                <p class="card-text text-muted small flex-grow-1">{{ product.description|truncatewords:8 }}</p>
+                
+                <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+                    <div class="text-start">
+                        <span class="h5 fw-bold mb-0 text-success">₹{{ product.price }} <span class="small text-muted">/ {{ product.unit }}</span></span>
+                    </div>
+                    
+                    {% if product.stock > 0 %}
+                    <form action="{% url 'add_to_cart' product.id %}" method="post" class="m-0 d-flex align-items-center gap-2">
+                        {% csrf_token %}
+                        <input type="number" name="quantity" value="1" min="1" max="{{ product.stock }}" class="form-control form-control-sm border-0 bg-light rounded-pill text-center" style="width: 50px;">
+                        <button type="submit" class="btn btn-grocery rounded-pill px-3 py-1 btn-sm fw-bold" title="Add to Cart">
+                            Add <i class="fas fa-cart-plus ms-1"></i>
+                        </button>
+                    </form>
+                    {% else %}
+                    <span class="text-danger small fw-bold">Out of Stock</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12 text-center py-5">
+        <div class="bg-white rounded-5 p-5 shadow-sm mx-auto" style="max-width: 400px;">
+            <i class="fas fa-search fa-4x text-success opacity-25 mb-3"></i>
+            <h4 class="fw-bold">No Products Found</h4>
+            <p class="text-muted">We couldn't find what you're looking for. Try a different search or category.</p>
+            <a href="{% url 'home' %}" class="btn btn-grocery mt-3">Reset Filters</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Pagination -->
+{% if is_paginated %}
+<nav class="d-flex justify-content-center mt-5 mb-4">
+    <ul class="pagination shadow-sm rounded-pill overflow-hidden">
+        {% if page_obj.has_previous %}
+        <li class="page-item"><a class="page-link border-0 text-success px-4" href="?page={{ page_obj.previous_page_number }}{% if request.GET.category_id %}&category_id={{ request.GET.category_id }}{% endif %}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"><i class="fas fa-chevron-left"></i></a></li>
+        {% endif %}
+        
+        <li class="page-item active"><span class="page-link border-0 bg-success px-4">{{ page_obj.number }}</span></li>
+        
+        {% if page_obj.has_next %}
+        <li class="page-item"><a class="page-link border-0 text-success px-4" href="?page={{ page_obj.next_page_number }}{% if request.GET.category_id %}&category_id={{ request.GET.category_id }}{% endif %}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"><i class="fas fa-chevron-right"></i></a></li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+
+<style>
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .btn-white { background: white; color: var(--text-dark); transition: 0.3s; }
+    .btn-white:hover { border-color: var(--primary-color) !important; color: var(--primary-color); }
+</style>
+{% endblock %}

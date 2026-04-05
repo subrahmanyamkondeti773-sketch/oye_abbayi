@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - GroceryMart{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-4">
+        <div class="card p-4 shadow-sm">
+            <h3 class="fw-bold text-center mb-4">Login to GroceryMart</h3>
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label">Username</label>
+                    <input type="text" name="username" class="form-control rounded-pill" required>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label">Password</label>
+                    <input type="password" name="password" class="form-control rounded-pill" required>
+                </div>
+                <div class="d-grid mb-3">
+                    <button type="submit" class="btn btn-grocery btn-lg rounded-pill">Login</button>
+                </div>
+                <div class="text-center">
+                    <p class="text-muted small">Don't have an account? <a href="{% url 'register' %}"
+                            class="text-success text-decoration-none fw-bold">Sign Up</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

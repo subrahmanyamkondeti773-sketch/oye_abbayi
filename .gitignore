@@ -1,0 +1,41 @@
+# Django
+*.log
+*.pot
+*.pyc
+__pycache__/
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Media
+media/
+
+# Static
+staticfiles/
+
+# Virtual Environment
+venv/
+env/
+.env
+
+# IDEs
+.vscode/
+.idea/
+
+# AI specifics
+.gemini/
+.agent/
+.system_generated/
+implementation_plan*.md
+task*.md
+walkthrough*.md
+oye_abbayi_logo_*.png
+default_product_image_*.png
+hero_farmer_*.png
+requirements.txt
+# Actually, keep requirements.txt
+!requirements.txt
+
+# OS
+.DS_Store
+Thumbs.db
