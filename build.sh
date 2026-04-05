@@ -11,5 +11,5 @@ python manage.py collectstatic --no-input
 # Run migrations
 python manage.py migrate
 
-# Optional: Seed data if database is empty
-# python manage.py seed_oye_abbayi
+# Seed initial data (Oye Abbayi categories and products)
+python manage.py seed_oye_abbayi
