@@ -1,9 +1,6 @@
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
 from core.models import Category, Product
-from django.core.files.base import ContentFile
-import requests
-
 class Command(BaseCommand):
     help = 'Seed initial data for Oye Abbayi'
 
