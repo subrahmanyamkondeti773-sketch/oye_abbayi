@@ -1,0 +1,26 @@
+databases:
+  - name: oye-abbayi-db
+    databaseName: oye_abbayi
+    user: oye_abbayi_user
+    plan: free
+
+services:
+  - type: web
+    name: oye-abbayi
+    plan: free
+    runtime: python
+    buildCommand: ./build.sh
+    startCommand: gunicorn GroceryMart.wsgi:application
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: oye-abbayi-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: WEB_CONCURRENCY
+        value: 4
+      - key: DEBUG
+        value: 'False'
+      - key: ALLOWED_HOSTS
+        value: '*'
